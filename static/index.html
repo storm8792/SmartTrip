@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartTrip · 行程播报</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1>SmartTrip</h1>
+      <span>基于语音合成的行程播报</span>
+    </div>
+  </div>
+
+  <div class="top-right">
+    <div class="weather-pill" id="weatherPill">
+      <span class="w-icon" id="wIcon">☁</span>
+      <span class="w-temp" id="wTemp">--</span>
+      <span class="w-text" id="wText">加载中</span>
+      <span class="w-dot" id="wDot" title="数据来源"></span>
+    </div>
+    <div class="clock">
+      <span id="clockTime">--:--:--</span>
+      <small id="clockDate">----</small>
+    </div>
+    <button class="icon-btn" id="btnTheme" title="切换深色模式">🌙</button>
+    <button class="icon-btn" id="btnSettings" title="设置">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- 左：课程表 -->
+  <section class="panel courses-panel">
+    <div class="panel-head">
+      <div>
+        <h2>我的课程</h2>
+        <p class="sub" id="courseStat">第 1 周</p>
+      </div>
+      <button class="btn btn-primary btn-sm" id="btnAddCourse">+ 添加</button>
+    </div>
+
+    <div class="view-tabs" id="viewTabs">
+      <button class="view-tab active" data-view="list">时间轴</button>
+      <button class="view-tab" data-view="grid">周课表</button>
+    </div>
+
+    <div class="timeline" id="timeline">
+      <div class="empty" id="courseEmpty">
+        <div class="empty-ico">🗓️</div>
+        <p>还没有课程</p>
+        <span>添加一门课，系统会在上课前自动播报提醒</span>
+      </div>
+    </div>
+
+    <div class="week-grid" id="weekGrid" hidden></div>
+
+    <div class="course-form" id="courseForm" hidden>
+      <div class="form-row">
+        <label>课程名称</label>
+        <input id="inputName" type="text" maxlength="30" placeholder="如：高等数学">
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>上课时间</label>
+          <input id="inputTime" type="time" value="09:00">
+        </div>
+        <div class="form-row">
+          <label>星期</label>
+          <select id="inputWeekday">
+            <option value="">每天</option>
+            <option value="0">周一</option>
+            <option value="1">周二</option>
+            <option value="2">周三</option>
+            <option value="3">周四</option>
+            <option value="4">周五</option>
+            <option value="5">周六</option>
+            <option value="6">周日</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>任课教师</label>
+          <input id="inputTeacher" type="text" maxlength="20" placeholder="如：张伟">
+        </div>
+        <div class="form-row">
+          <label>教室</label>
+          <input id="inputRoom" type="text" maxlength="20" placeholder="如：教一 302">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>周次</label>
+        <input id="inputWeeks" type="text" maxlength="30" placeholder="如 1-16，留空表示每周都上">
+      </div>
+      <div class="form-row">
+        <label>颜色标签</label>
+        <div class="color-picker" id="colorPicker">
+          <button type="button" class="swatch" data-color="blue" style="--c:#2f6bff"></button>
+          <button type="button" class="swatch" data-color="green" style="--c:#10b981"></button>
+          <button type="button" class="swatch" data-color="violet" style="--c:#8b5cf6"></button>
+          <button type="button" class="swatch" data-color="amber" style="--c:#f59e0b"></button>
+          <button type="button" class="swatch" data-color="rose" style="--c:#f43f5e"></button>
+          <button type="button" class="swatch" data-color="cyan" style="--c:#06b6d4"></button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>备注</label>
+        <input id="inputNote" type="text" maxlength="80" placeholder="如：带教材与计算器">
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost btn-sm" id="btnCancelCourse">取消</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btnSaveCourse">保存</button>
+      </div>
+    </div>
+
+    <div class="panel-tools">
+      <button class="btn btn-ghost btn-sm" id="btnExport">导出课程</button>
+      <button class="btn btn-ghost btn-sm" id="btnImport">导入课程</button>
+      <input type="file" id="fileImport" accept=".json,application/json" hidden>
+    </div>
+  </section>
+
+  <!-- 右：播报 -->
+  <section class="panel broadcast-panel">
+    <div class="broadcast-head">
+      <span class="tag" id="adviceTag">课前播报</span>
+      <span class="advice-time" id="adviceTime"></span>
+    </div>
+
+    <blockquote class="advice-text" id="adviceText">
+      添加课程后，系统会在上课前自动获取天气、生成出行建议并语音播报。
+    </blockquote>
+
+    <div class="wave" id="wave" aria-hidden="true"></div>
+
+    <div class="broadcast-actions">
+      <button class="btn btn-play" id="btnSpeak">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 5 6 9H3v6h3l5 4V5z"/>
+          <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+          <path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+        </svg>
+        <span id="speakLabel">播放播报</span>
+      </button>
+      <button class="btn btn-ghost" id="btnPreview">重新生成建议</button>
+      <button class="btn btn-ghost" id="btnWeatherRefresh" title="刷新天气">刷新天气</button>
+    </div>
+
+    <div class="hourly-wrap">
+      <div class="section-label">未来 12 小时</div>
+      <div class="hourly" id="hourly"></div>
+    </div>
+
+    <div class="next-card" id="nextCard" hidden>
+      <div class="next-label">下一次提醒</div>
+      <div class="next-main">
+        <span class="next-course" id="nextCourse">--</span>
+        <span class="next-count" id="nextCount">--:--</span>
+      </div>
+      <div class="next-sub" id="nextSub"></div>
+    </div>
+
+    <div class="records">
+      <div class="records-head">
+        <div class="rec-tabs" id="recTabs">
+          <button class="rec-tab active" data-rec="history">播报历史</button>
+          <button class="rec-tab" data-rec="log">运行日志</button>
+        </div>
+        <button class="link-btn" id="btnClearHistory">清空历史</button>
+      </div>
+      <ul class="rec-list" id="historyList"></ul>
+      <ul class="rec-list" id="logList" hidden></ul>
+    </div>
+  </section>
+</main>
+
+<!-- 设置抽屉 -->
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h3>设置</h3>
+    <button class="icon-btn" id="btnCloseDrawer">✕</button>
+  </div>
+
+  <div class="drawer-body">
+    <div class="field">
+      <label>提前提醒分钟数</label>
+      <div class="range-row">
+        <input type="range" id="setAdvance" min="0" max="60" step="1" value="10">
+        <span class="range-val" id="advanceVal">10 分钟</span>
+      </div>
+      <p class="hint">到达「上课时间 − 该分钟数」时自动触发播报</p>
+    </div>
+
+    <div class="field">
+      <label>语音播报</label>
+      <label class="switch-row">
+        <input type="checkbox" id="setAutoSpeak" checked>
+        <span>收到提醒后自动播报</span>
+      </label>
+      <div class="range-row">
+        <input type="range" id="setRate" min="0.6" max="1.8" step="0.1" value="1">
+        <span class="range-val" id="rateVal">1.0×</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>校历</label>
+      <input type="date" id="setTermStart">
+      <p class="hint">学期开始日期，用于计算当前教学周，课程的「周次」据此生效</p>
+    </div>
+
+    <div class="field">
+      <label>天气数据源</label>
+      <select id="setProvider">
+        <option value="mock">演示数据（无需 Key，可直接运行）</option>
+        <option value="qweather">和风天气 API（需 API Key）</option>
+      </select>
+      <input type="text" id="setCity" placeholder="城市，如：广州">
+      <input type="text" id="setLocation" placeholder="经纬度，如：113.2644,23.1291">
+      <input type="password" id="setApiKey" placeholder="和风天气 API Key">
+      <p class="hint">Key 仅保存在本机 data/settings.json，不会上传</p>
+    </div>
+
+    <div class="field">
+      <label>语音引擎</label>
+      <div class="engine-box" id="engineBox">检测中…</div>
+      <p class="hint">默认使用浏览器内置中文语音；若把 OpenVoice 模型放入 checkpoints/，将自动切换为本地音色克隆</p>
+    </div>
+  </div>
+
+  <div class="drawer-foot">
+    <button class="btn btn-primary" id="btnSaveSettings">保存设置</button>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "advanceMinutes": 10,
+  "autoSpeak": true,
+  "voiceRate": 1.0,
+  "voiceName": "",
+  "city": "广州",
+  "location": "113.2644,23.1291",
+  "apiKey": "",
+  "provider": "mock",
+  "termStart": "2026-09-01"
+}

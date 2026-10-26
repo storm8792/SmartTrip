@@ -1,0 +1,38 @@
+[
+  {
+    "id": "c_demo0001",
+    "name": "高等数学",
+    "time": "09:00",
+    "enabled": true,
+    "teacher": "张伟",
+    "room": "教一 302",
+    "weekday": 0,
+    "weeks": "1-16",
+    "color": "blue",
+    "note": "带教材与计算器"
+  },
+  {
+    "id": "c_demo0002",
+    "name": "大学英语",
+    "time": "14:00",
+    "enabled": true,
+    "teacher": "李娜",
+    "room": "外语楼 105",
+    "weekday": 1,
+    "weeks": "1-16",
+    "color": "green",
+    "note": ""
+  },
+  {
+    "id": "c_demo0003",
+    "name": "数据结构",
+    "time": "16:00",
+    "enabled": true,
+    "teacher": "王强",
+    "room": "计算机楼 401",
+    "weekday": 2,
+    "weeks": "1-16",
+    "color": "violet",
+    "note": "实验课需带笔记本"
+  }
+]
